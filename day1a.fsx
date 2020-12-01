@@ -1,3 +1,12 @@
+let rec solve entries =
+    match entries with
+    | head :: tail ->
+        tail
+        |> List.tryFind ((+) head >> (=) 2020)
+        |> Option.map ((*) head)
+        |> Option.defaultWith (fun _ -> solve tail)
+    | [] -> 0
+
 let input =
     [ 1945
       2004
@@ -200,13 +209,4 @@ let input =
       1809
       1812 ]
 
-let rec solve entries =
-    match entries with
-    | head :: tail ->
-        tail
-        |> List.tryFind ((+) head >> (=) 2020)
-        |> Option.map ((*) head)
-        |> Option.defaultWith (fun _ -> solve tail)
-    | [] -> 0
-
-solve input |> printfn "%A"
+solve input |> printfn "Solution: %A"

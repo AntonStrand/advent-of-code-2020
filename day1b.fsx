@@ -1,3 +1,12 @@
+let rec solve entries =
+    match entries with
+    | head :: tail ->
+        tail
+        |> List.tryPick (fun x ->
+            List.tryPick (fun y -> if head + y + x = 2020 then Some(head * y * x) else None) entries)
+        |> Option.defaultWith (fun _ -> solve tail)
+    | _ -> 0
+
 let input =
     [ 1945
       2004
@@ -200,13 +209,4 @@ let input =
       1809
       1812 ]
 
-let rec solve entries =
-    match entries with
-    | head :: tail ->
-        tail
-        |> List.tryPick (fun x ->
-            List.tryPick (fun y -> if head + y + x = 2020 then Some(head * y * x) else None) entries)
-        |> Option.defaultWith (fun _ -> solve tail)
-    | _ -> 0
-
-solve input |> printfn "%A"
+solve input |> printfn "Solution: %A"
