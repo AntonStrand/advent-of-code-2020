@@ -1,11 +1,11 @@
 let rec solve entries =
     match entries with
+    | [] -> 0
     | head :: tail ->
         tail
         |> List.tryPick (fun x ->
             List.tryPick (fun y -> if head + y + x = 2020 then Some(head * y * x) else None) entries)
-        |> Option.defaultWith (fun _ -> solve tail)
-    | _ -> 0
+        |> Option.defaultValue (solve tail)
 
 let input =
     [ 1945

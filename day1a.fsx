@@ -1,11 +1,11 @@
 let rec solve entries =
     match entries with
+    | [] -> 0
     | head :: tail ->
         tail
         |> List.tryFind ((+) head >> (=) 2020)
         |> Option.map ((*) head)
-        |> Option.defaultWith (fun _ -> solve tail)
-    | [] -> 0
+        |> Option.defaultValue (solve tail)
 
 let input =
     [ 1945
