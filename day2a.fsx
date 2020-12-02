@@ -15,6 +15,7 @@ let isValid (min, max, char, password) =
 
 let solve entries =
     Array.toList entries
-    |> List.fold (fun sum entry -> if isValid entry then sum + 1 else sum) 0
+    |> List.where isValid
+    |> List.length
 
 solve input |> printfn "Solution %A"

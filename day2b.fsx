@@ -18,6 +18,7 @@ let isValid (p1, p2, char, password) =
 
 let solve entries =
     Array.toList entries
-    |> List.fold (fun sum entry -> if isValid entry then sum + 1 else sum) 0
+    |> List.where isValid
+    |> List.length
 
 solve input |> printfn "Solution %A"
