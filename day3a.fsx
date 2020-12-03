@@ -18,8 +18,7 @@ let rec findTrees sum pos map =
         if hitsTree pos mapPart then findTrees (sum + 1) (pos + 3) rest else findTrees (sum) (pos + 3) rest
     | [] -> sum
 
-let solve entries =
-    List.ofArray entries |> List.tail |> findTrees 0 3
+let solve map = map |> List.tail |> findTrees 0 3
 
 
 solve input |> printfn "Solution %A"

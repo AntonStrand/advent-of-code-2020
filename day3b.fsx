@@ -19,13 +19,13 @@ let countTrees map movement =
     |> List.filter (hitsTree movement)
     |> List.length
 
-let solve entries =
+let solve map =
     [ (1, 1)
       (1, 3)
       (1, 5)
       (1, 7)
       (2, 1) ]
-    |> List.map (countTrees (List.ofArray entries))
+    |> List.map (countTrees map)
     |> List.fold (*) 1
 
 solve input |> printfn "Solution %A"
