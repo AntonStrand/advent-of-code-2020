@@ -5,37 +5,27 @@
 #load "day3-input.fsx"
 open Input
 
-let getItem mapPart pos = Seq.item pos mapPart
+let getItem map pos = Seq.item pos map
 
-let hitsTree pos mapPart =
-    pos % String.length mapPart
-    |> getItem mapPart
-    |> (=) '#'
+let hitsTree (down, right) (pos, map) =
+    pos % down = 0
+    && ((pos / down) * right) % String.length map
+       |> getItem map
+       |> (=) '#'
 
-let rec findTrees sum pos offset map =
-    match map with
-    | mapPart :: rest ->
-        if hitsTree pos mapPart
-        then findTrees (sum + 1) (pos + offset) offset rest
-        else findTrees (sum) (pos + offset) offset rest
-    | [] -> sum
-
-let rec everyotherMapPartTrees sum pos offset map =
-    match map with
-    | _ :: mapPart :: rest ->
-        if hitsTree pos mapPart
-        then everyotherMapPartTrees (sum + 1) (pos + offset) offset rest
-        else everyotherMapPartTrees (sum) (pos + offset) offset rest
-    | _ -> sum
+let countTrees map movement =
+    map
+    |> List.indexed
+    |> List.filter (hitsTree movement)
+    |> List.length
 
 let solve entries =
-    let map = List.ofArray entries |> List.tail
-
-    findTrees 0 1 1 map
-    * findTrees 0 3 3 map
-    * findTrees 0 5 5 map
-    * findTrees 0 7 7 map
-    * everyotherMapPartTrees 0 1 1 map
-
+    [ (1, 1)
+      (1, 3)
+      (1, 5)
+      (1, 7)
+      (2, 1) ]
+    |> List.map (countTrees (List.ofArray entries))
+    |> List.fold (*) 1
 
 solve input |> printfn "Solution %A"
