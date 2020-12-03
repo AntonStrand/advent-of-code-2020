@@ -5,12 +5,12 @@
 #load "day3-input.fsx"
 open Input
 
-let getItem map pos = Seq.item pos map
+let getTerrain map pos = Seq.item pos map
 
 let hitsTree (down, right) (pos, map) =
     pos % down = 0
     && ((pos / down) * right) % String.length map
-       |> getItem map
+       |> getTerrain map
        |> (=) '#'
 
 let countTrees map movement =
