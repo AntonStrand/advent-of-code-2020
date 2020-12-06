@@ -106,6 +106,7 @@ let parsePassport =
              cid ]
     |> many
     |> noRemainingInput
+    |>> Set.ofList
 
 let requiredCategories =
     Set.ofList [ "byr"
@@ -118,7 +119,7 @@ let requiredCategories =
 
 let isValidPassport passport =
     match run parsePassport passport with
-    | Success (parsed, _) -> Set.isSubset requiredCategories (Set.ofList parsed)
+    | Success (parsed, _) -> Set.isSubset requiredCategories parsed
     | Failure _ -> false
 
 let solve =
