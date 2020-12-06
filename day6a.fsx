@@ -10,18 +10,17 @@ open Parser
 
 let input = File.ReadAllText "./day6-input.txt"
 
-let parser =
-    many (anyOf [ 'a' .. 'z' ] .>> opt (pchar '\n'))
-    |>> Set.ofList
-    |>> Set.count
+let personAnswers =
+    many1 (anyOf [ 'a' .. 'z' ]) .>> opt (pchar '\n')
 
-let parse group =
-    match run parser group with
-    | Success (count, _) -> count
+let groupAnswers =
+    many1 personAnswers |>> List.concat |>> Set.ofList
+
+let parser = many (groupAnswers .>> opt (pchar '\n'))
+
+let solve input =
+    match run parser input with
+    | Success (answers, _) -> answers |> List.sumBy Set.count
     | Failure _ -> 0
-
-let group (str: string) = str.Split "\n\n" |> List.ofArray
-
-let solve = group >> List.map parse >> List.sum
 
 solve input |> printfn "Solution %A"
