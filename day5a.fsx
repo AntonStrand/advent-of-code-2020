@@ -11,9 +11,7 @@ let lines (str: string) = str.Split '\n' |> List.ofArray
 let toBinary: (string -> string) =
     Seq.fold (fun bin c -> bin + (if c = 'B' || c = 'R' then "1" else "0")) ""
 
-let binaryToSeatId bin = System.Convert.ToInt32(bin, 2)
-
-let toSeatId = toBinary >> binaryToSeatId
+let toSeatId code = System.Convert.ToInt32(toBinary code, 2)
 
 let solve = lines >> List.map toSeatId >> List.max
 
