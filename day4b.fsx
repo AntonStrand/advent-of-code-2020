@@ -10,8 +10,6 @@ open Parser
 
 let input = File.ReadAllText "./day4-input.txt"
 
-let always x _ = x
-
 let whitespace = many (anyOf [ ' '; '\n'; '\t' ])
 
 let digit = anyOf [ '0' .. '9' ]
