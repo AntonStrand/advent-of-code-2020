@@ -15,7 +15,7 @@ let requiredCategories =
                  "ecl"
                  "pid" ]
 
-let split (chars: char array) (string: string) = string.Split chars
+let split delimiter (string: string) = string.Split delimiter
 
 let pickCategories =
     split [| ' '; '\n' |]
