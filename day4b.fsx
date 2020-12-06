@@ -95,6 +95,15 @@ let cid =
 
 let toPassports (str: string) = str.Split "\n\n" |> List.ofArray
 
+let requiredCategories =
+    Set.ofList [ "byr"
+                 "iyr"
+                 "eyr"
+                 "hgt"
+                 "hcl"
+                 "ecl"
+                 "pid" ]
+
 let parsePassport =
     choice [ byr
              iyr
@@ -105,21 +114,12 @@ let parsePassport =
              pid
              cid ]
     |> many
-    |> noRemainingInput
     |>> Set.ofList
-
-let requiredCategories =
-    Set.ofList [ "byr"
-                 "iyr"
-                 "eyr"
-                 "hgt"
-                 "hcl"
-                 "ecl"
-                 "pid" ]
+    |>> Set.isSubset requiredCategories
 
 let isValidPassport passport =
     match run parsePassport passport with
-    | Success (parsed, _) -> Set.isSubset requiredCategories parsed
+    | Success (isValid, _) -> isValid
     | Failure _ -> false
 
 let solve =
