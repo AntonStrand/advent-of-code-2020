@@ -17,7 +17,7 @@ let findSeat seats =
     let rec search ids =
         match ids with
         // If the difference between x & y is greater than 1 the seat id is available
-        | x :: y :: tail -> if y - x = 2 then x + 1 else search (y :: tail)
+        | x :: y :: tail -> if y - x <> 1 then x + 1 else search (y :: tail)
         | _ -> 0
 
     search (List.sort seats)

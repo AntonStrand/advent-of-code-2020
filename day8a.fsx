@@ -6,7 +6,7 @@
 open System.IO
 open Parser
 
-let input = File.ReadAllText "./day8-input.txt"
+// let input = File.ReadAllText "./day8-input.txt"
 
 type Operation =
     | Acc of int
@@ -35,9 +35,10 @@ let pnop =
     >>. pint
     |>> fun _ -> Noop
 
-let pcommand = choice [ pacc; pjmp; pnop ]
+let pcommand =
+    choice [ pacc; pjmp; pnop ] .>> opt (pchar '\n')
 
-let pcommands = many1 (pcommand .>> opt (pchar '\n'))
+let pcommands = many1 pcommand
 
 let findRepitition commands =
     let rec inner visited acc idx =
