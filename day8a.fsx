@@ -6,7 +6,7 @@
 open System.IO
 open Parser
 
-let input = File.ReadAllText "./day7-input.txt"
+let input = File.ReadAllText "./day8-input.txt"
 
 type Operation =
     | Acc of int
@@ -52,10 +52,9 @@ let findRepitition commands =
 
     inner Set.empty 0 0
 
-
 let solve input =
     match run pcommands input with
-    | Success (rules, _) -> rules |> Array.ofList |> findRepitition
+    | Success (commands, _) -> commands |> Array.ofList |> findRepitition
     | Failure _ -> 0
 
 solve input |> printfn "Solution %A"
