@@ -13,7 +13,6 @@ type Operation =
     | Jmp of int
     | Noop
 
-
 let pint =
     let zero = pstring "0"
 
