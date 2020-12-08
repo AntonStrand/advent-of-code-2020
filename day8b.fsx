@@ -13,7 +13,6 @@ type Operation =
     | Jmp of int
     | Noop of int
 
-
 let pint =
     let zero = pstring "0"
 
@@ -32,9 +31,10 @@ let pacc = pstring "acc " >>. pint |>> Acc
 let pjmp = pstring "jmp " >>. pint |>> Jmp
 let pnop = pstring "nop " >>. pint |>> Noop
 
-let pcommand = choice [ pacc; pjmp; pnop ]
+let pcommand =
+    choice [ pacc; pjmp; pnop ] .>> opt (pchar '\n')
 
-let pcommands = many1 (pcommand .>> opt (pchar '\n'))
+let pcommands = many1 pcommand |>> Array.ofList
 
 let updateCmd cmd at =
     Array.mapi (fun i c -> if i = at then cmd else c)
@@ -88,11 +88,7 @@ let runAllCommands bruteforceData =
 
 let solve input =
     match run pcommands input with
-    | Success (commands, _) ->
-        commands
-        |> Array.ofList
-        |> makeBruteforceData
-        |> runAllCommands
+    | Success (commands, _) -> commands |> makeBruteforceData |> runAllCommands
     | Failure _ -> 0
 
 solve input |> printfn "Solution %A"
