@@ -6,12 +6,14 @@
 open System.IO
 open Parser
 
-// let input = File.ReadAllText "./day8-input.txt"
+let input = File.ReadAllText "./day8-input.txt"
 
 type Operation =
     | Acc of int
     | Jmp of int
     | Noop
+
+type State = int * int * Set<int>
 
 let pint =
     let zero = pstring "0"
@@ -41,17 +43,17 @@ let pcommand =
 let pcommands = many1 pcommand
 
 let findRepitition commands =
-    let rec inner visited acc idx =
-        if not <| Set.contains idx visited then
-            let v = Set.add idx visited
-            match Array.get commands idx with
-            | Acc n -> inner v (acc + n) (idx + 1)
-            | Jmp dir -> inner v acc (idx + dir)
-            | Noop -> inner v acc (idx + 1)
+    let rec inner (acc, index, executed) =
+        if not <| Set.contains index executed then
+            let exed = Set.add index executed
+            match Array.get commands index with
+            | Acc n -> inner (acc + n, index + 1, exed)
+            | Jmp dir -> inner (acc, index + dir, exed)
+            | Noop -> inner (acc, index + 1, exed)
         else
             acc
 
-    inner Set.empty 0 0
+    inner (0, 0, Set.empty)
 
 let solve input =
     match run pcommands input with

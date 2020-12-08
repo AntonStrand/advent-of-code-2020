@@ -11,9 +11,8 @@ let input = File.ReadAllText "./day8-input.txt"
 type Operation =
     | Acc of int
     | Jmp of int
-    | Noop
+    | Noop of int
 
-let always x _ = x
 
 let pint =
     let zero = pstring "0"
@@ -31,73 +30,69 @@ let pint =
 
 let pacc = pstring "acc " >>. pint |>> Acc
 let pjmp = pstring "jmp " >>. pint |>> Jmp
-let pnop = pstring "nop " >>. pint |>> always Noop
+let pnop = pstring "nop " >>. pint |>> Noop
 
 let pcommand = choice [ pacc; pjmp; pnop ]
 
 let pcommands = many1 (pcommand .>> opt (pchar '\n'))
 
-let updateCommandAt at cmd cmds =
-    cmds
-    |> Array.mapi (fun i c -> if i = at then cmd else c)
+let updateCmd cmd at =
+    Array.mapi (fun i c -> if i = at then cmd else c)
 
-// let findRepitition commands =
-//     let numCommands = List.length commands - 1
+type State = int * int * Set<int>
 
-//     let rec inner visited acc previous idx cmds =
-//         printfn "%A  | %A" (Array.get cmds idx) (idx + 1)
-//         if Set.count visited = numCommands then
-//             (List.ofArray cmds, acc)
-//         else if not <| Set.contains idx visited then
-//             let v = Set.add idx visited
-//             match Array.get cmds idx with
-//             | Acc n -> inner v (acc + n) idx (idx + 1) cmds
-//             | Jmp dir -> inner v acc idx (idx + dir) cmds
-//             | Noop _ -> inner v acc idx (idx + 1) cmds
-//         else
-//             match Array.get cmds previous with
-//             | Acc n -> inner visited (acc + n) idx (previous + 1) cmds
-//             | Jmp dir -> inner visited acc idx (previous + 1) (updateCommandAt idx (Noop dir) cmds)
-//             | Noop dir -> inner visited acc idx (previous + dir) (updateCommandAt idx (Jmp dir) cmds)
+type ExecutionResult =
+    | Executed of State
+    | Done of int
+    | Looping
 
-//     inner Set.empty 0 0 0 (Array.ofList commands)
-
-let isErrorCmd idx prev commands =
-    let rec inner i cmds =
-        if i < Array.length cmds then
-            match Array.item i cmds with
-            | Jmp dir -> idx + i + dir > prev
-            | _ -> inner (i + 1) cmds
+let execute commands (acc, index, executed) =
+    match Array.tryItem index commands with
+    | Some command ->
+        if Set.contains index executed then
+            Looping
         else
-            false
+            let execs = Set.add index executed
+            Executed
+            <| match command with
+               | Acc n -> (acc + n, index + 1, execs)
+               | Jmp dir -> (acc, index + dir, execs)
+               | Noop _ -> (acc, index + 1, execs)
+    | None -> Done acc
 
-    inner 0 (Array.sub commands idx (prev - idx))
+let makeBruteforceData commands =
+    let rec inner variations i =
+        match Array.tryItem i commands with
+        | Some command ->
+            match command with
+            | Acc _ -> inner variations (i + 1)
+            | Jmp dir -> inner (updateCmd (Noop dir) i commands :: variations) (i + 1)
+            | Noop dir -> inner (updateCmd (Jmp dir) i commands :: variations) (i + 1)
+        | None -> variations
 
-let findRepitition commands =
-    let numCommands = Array.length commands
+    inner [ Array.empty ] 0
 
-    let rec inner acc prev idx =
-        printfn "%A %A %A %A" idx prev (idx < prev) (isErrorCmd idx prev commands)
-        if idx < prev then
-            match isErrorCmd idx prev commands with
-            | true -> inner acc idx (prev + 1)
-            | false -> inner acc idx idx
-        else if idx < numCommands then
-            match Array.get commands idx with
-            | Acc n -> inner (acc + n) idx (idx + 1)
-            | Jmp dir -> inner acc idx (idx + dir)
-            | Noop -> inner acc idx (idx + 1)
-        else
-            acc
+let runAllCommands bruteforceData =
+    let startState = (0, 0, Set.empty)
 
-    inner 0 -1 0
+    let rec inner state variations =
+        match variations with
+        | [] -> 0
+        | cmds :: remaining ->
+            match execute cmds state with
+            | Executed next -> inner next variations
+            | Looping -> inner startState remaining
+            | Done acc -> acc
+
+    inner startState bruteforceData
 
 let solve input =
     match run pcommands input with
-    | Success (commands, _) -> commands |> Array.ofList |> findRepitition
-    // |> fst
-    // |> findRepitition
-    // |> snd
+    | Success (commands, _) ->
+        commands
+        |> Array.ofList
+        |> makeBruteforceData
+        |> runAllCommands
     | Failure _ -> 0
 
 solve input |> printfn "Solution %A"
