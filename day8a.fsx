@@ -19,7 +19,8 @@ let pint =
     let noneZeroInt =
         anyOf [ '1' .. '9' ]
         .>>. many (anyOf [ '0' .. '9' ])
-        |>> fun (z, ds) -> z :: ds |> charListToString
+        |>> fun (digit, digits) -> digit :: digits
+        |>> charListToString
 
     (pchar '-' <|> pchar '+')
     .>>. (zero <|> noneZeroInt)
