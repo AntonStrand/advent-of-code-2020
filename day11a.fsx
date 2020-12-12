@@ -88,7 +88,13 @@ let viewMap =
 
 let solve input =
     match run parse input with
-    | Success (map, _) -> simulate map |> simulate |> simulate |> viewMap
+    | Success (map, _) ->
+        simulate map
+        |> simulate
+        |> simulate
+        |> simulate
+        |> simulate
+        |> viewMap
     | Failure _ -> "[||]"
 
 solve input |> printfn "Solution %A"
